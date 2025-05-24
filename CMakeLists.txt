@@ -1,35 +1,44 @@
 cmake_minimum_required(VERSION 3.8)
 project(ros2_pong_semiautomatic)
 
-# Alapértelmezett C++ verzió
+# C++ szabvány
 if(NOT CMAKE_CXX_STANDARD)
   set(CMAKE_CXX_STANDARD 14)
 endif()
 
-# Fordítási figyelmeztetések
+# Figyelmeztetések
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
 endif()
 
-# Kötelező ROS2 csomagok
+# Kötelező ROS csomagok
 find_package(ament_cmake REQUIRED)
 find_package(rclcpp REQUIRED)
 find_package(std_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
+find_package(builtin_interfaces REQUIRED)
+find_package(rosidl_default_generators REQUIRED)
 
-# Függőségek
-set(ament_dependencies
+# Üzenetek generálása
+rosidl_generate_interfaces(${PROJECT_NAME}
+  "msg/GameState.msg"
+  DEPENDENCIES builtin_interfaces
+)
+
+# Fejléc útvonal
+include_directories(include)
+
+# Végrehajtható node
+add_executable(game_manager src/game_manager.cpp)
+ament_target_dependencies(game_manager
   rclcpp
   std_msgs
   geometry_msgs
 )
 
-# Fejléc mappák
-include_directories(include)
-
-# 🔧 A saját node-od: game_manager
-add_executable(game_manager src/game_manager.cpp)
-ament_target_dependencies(game_manager ${ament_dependencies})
+# Linkelés a generált típus-támogatáshoz
+rosidl_get_typesupport_target(cpp_typesupport_target ${PROJECT_NAME} "rosidl_typesupport_cpp")
+target_link_libraries(game_manager ${cpp_typesupport_target})
 
 # Telepítés
 install(TARGETS
@@ -37,7 +46,7 @@ install(TARGETS
   DESTINATION lib/${PROJECT_NAME}
 )
 
-# Launch fájlok (ha vannak)
+# Launch fájlok ha vannak
 install(DIRECTORY launch
   DESTINATION share/${PROJECT_NAME}
 )
