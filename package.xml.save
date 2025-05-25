@@ -13,10 +13,12 @@
   <depend>geometry_msgs</depend>
 
   <build_depend>rosidl_default_generators</build_depend>
-  <build_export_depend>rosidl_default_generators</build_export_depend>
   <exec_depend>rosidl_default_runtime</exec_depend>
 
   <export>
     <member_of_group>rosidl_interface_packages</member_of_group>
   </export>
-</package>
+</package
+
+
+s
